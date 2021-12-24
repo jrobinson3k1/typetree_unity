@@ -31,7 +31,7 @@ def main():
     namespace = Namespace()
     setattr(namespace, "default_output_folder", default_output_folder)
 
-    parser = ArgumentParser(description = "Generates type trees from C# assemblies and outputs in JSON format")
+    parser = ArgumentParser(description = "Generates type trees from Unity assemblies and outputs in JSON format")
     parser.add_argument("assembly_folder", type = str, action = validators.ValidateFolderExistsAction, metavar = "input_folder", help = "folder containing assemblies")
     parser.add_argument("unity_version", type = str, action = validators.ValidateUnityVersion, help = "Unity build version")
     parser.add_argument("-a, --assembly", type = str, dest = "assembly_file", default = default_assembly_filename, action = validators.ValidateAssemblyFileExistsAction, metavar = "", help = "assembly file to load (default: " + default_assembly_filename + ")")
@@ -59,7 +59,7 @@ def main():
             trees.sort()
 
         output_file = args.output_file if args.output_file else os.path.join(default_output_folder, (default_classname_name if args.names_only else default_typetree_name) + ".json")
-        generator.export_tree(trees, output_file, only_output_class_names = args.names_only)
+        generator.export_tree(trees, output_file)
         print("Success")
     else:
         print("Type tree did not generate")
@@ -171,9 +171,13 @@ class TypeTreeGenerator():
 
         return tree
 
-    def export_tree(self, tree, output_file, only_output_class_names = False):
-        if not output_file or not os.access(os.path.dirname(output_file), os.W_OK):
-            raise ValueError("output file not valid or directory is inaccessible")
+    def export_tree(self, tree, output_file):
+        dir = os.path.dirname(output_file)
+        if dir and not os.path.isdir(dir):
+            os.mkdir(dir)
+
+        if not os.access(dir, os.W_OK):
+            raise ValueError("output file's directory is inaccessible")
 
         print("Exporting tree to " + output_file + "...")
         with open(output_file, "wt", encoding = "utf8") as f:
