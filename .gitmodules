@@ -1,0 +1,3 @@
+[submodule "uvf"]
+	path = uvf
+	url = https://github.com/jrobinson3k1/UnityVersionFinderPy.git
