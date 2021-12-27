@@ -1,4 +1,7 @@
 import os
+import logging
+from logging import LogRecord
+from logging import StreamHandler
 from argparse import Namespace
 from argparse import ArgumentParser
 import validators
@@ -8,15 +11,15 @@ from TypeTreeGeneratorPy import __version__ as version
 
 
 def main():
-    args = get_args()
+    _init_logger()
+    args = _get_args()
 
-    global debug
-    debug = args.debug
+    if args.enable_debug_output:
+        console.setLevel(logging.DEBUG)
 
-    class_names = [args.class_names] if not isinstance(args.class_names, list) else args.class_names
     generator = TypeTreeGenerator(args.assembly_folder, args.unity_version)
     trees = {}
-    for class_name in class_names:
+    for class_name in args.class_names:
         trees.update(generator.generate_tree(args.assembly_file, class_name))
 
     if trees:
@@ -27,12 +30,11 @@ def main():
             trees.sort()
 
         generator.export_tree(trees, args.output_file)
-        print("Success")
     else:
-        print("Type tree did not generate")
+        logging.info("Type tree did not generate")
 
 
-def get_args():
+def _get_args():
     default_output_folder = os.path.join(os.path.dirname(__file__), "output")
     default_assembly_filename = "Assembly-CSharp.dll"
     default_typetree_name = "typetree"
@@ -45,20 +47,18 @@ def get_args():
     parser = ArgumentParser(description="Generates type trees from Unity assemblies and outputs in JSON format")
     parser.add_argument(
         "assembly_folder",
-        type=str,
         action=validators.ValidateFolderExistsAction,
         metavar="input_folder",
         help="folder containing assemblies"
     )
     parser.add_argument(
         "unity_version",
-        type=str,
         action=validators.ValidateUnityVersion,
         help="Unity build version"
     )
     parser.add_argument(
-        "-a, --assembly",
-        type=str,
+        "-a",
+        "--assembly",
         dest="assembly_file",
         default=default_assembly_filename,
         action=validators.ValidateAssemblyFileExistsAction,
@@ -66,41 +66,76 @@ def get_args():
         help="assembly file to load (default: " + default_assembly_filename + ")"
     )
     parser.add_argument(
-        "-c, --classes",
-        type=str,
+        "-c",
+        "--classes",
         dest="class_names",
-        default="",
+        default=[""],
         nargs="*",
         metavar="",
         help="classes to dump for the type tree (all if unspecified). Automatically dumps class dependencies."
     )
     parser.add_argument(
-        "-o, --output",
-        type=str,
+        "-o",
+        "--output",
         dest="output_file",
         action=validators.ValidateOutputFileAction,
         metavar="",
-        help="type tree output file (default: " + default_output_folder + os.path.sep + "[" + default_typetree_name + "|" + default_classname_name + "].json).")
+        help="type tree output file (default: " + default_output_folder + os.path.sep + default_typetree_name + ".json)."
+    )
     parser.add_argument(
-        "-v, --version",
+        "-v",
+        "--version",
         action="version",
         version="%(prog)s " + version, help="version of this package"
     )
     parser.add_argument(
-        "-n, --namesonly",
+        "-n",
+        "--namesonly",
         dest="names_only",
         action="store_true",
-        help="only output class names (will output as " + default_classname_name + ".json if output is not specified)")
+        help="only output class names (will output as " + default_classname_name + ".json if output is not specified)"
+    )
     parser.add_argument(
-        "-d, --debug",
-        dest="debug",
+        "-d",
+        "--debug",
+        dest="enable_debug_output",
         action="store_true",
-        help="enable debug logging"
+        help="enable debug output"
     )
 
     args = parser.parse_args(namespace=namespace)
     args.output_file = args.output_file if args.output_file else os.path.join(default_output_folder, (default_classname_name if args.names_only else default_typetree_name) + ".json")
     return args
+
+
+def _init_logger():
+    if not os.path.isdir("logs"):
+        os.mkdir("logs")
+
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s",
+        datefmt="%m-%d %H:%M",
+        filename="logs/logs.txt",
+        filemode="w"
+    )
+
+    console.setLevel(logging.INFO)
+    console.setFormatter(logging.Formatter('%(message)s'))
+    logging.getLogger().addHandler(console)
+
+
+class NoStackTraceStreamHandler(StreamHandler):
+    def emit(self, record):
+        try:
+            if record.exc_info:
+                record = LogRecord(record.name, record.levelname, record.pathname, record.lineno, record.msg, record.args, None, record.funcName, record.stack_info)
+            super().emit(record)
+        except Exception:
+            self.handleError(record)
+
+
+console = NoStackTraceStreamHandler()
 
 
 if __name__ == "__main__":

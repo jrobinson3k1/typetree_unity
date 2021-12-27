@@ -1,9 +1,8 @@
 import os
+import logging
 from collections import deque
 import re
 import json
-
-debug = True
 
 
 class TypeTreeGenerator(object):
@@ -17,17 +16,13 @@ class TypeTreeGenerator(object):
         from System import Array
         self.generator = self._create_generator(assembly_folder)
         self.unity_version = Array[int]([int(s) for s in unity_version.split('.')])
-        print(str(self.unity_version))
 
-    def generate_tree(self, assembly_file, class_name=""):
+    def generate_tree(self, assembly_file, class_name=[""]):
         if not assembly_file:
             raise ValueError("assembly file not specified")
 
-        dump_all = True if not class_name else False
-        if dump_all:
-            print("Generating trees for all classes...")
-        else:
-            print("Generating trees for " + class_name + " and dependencies...")
+        dump_all = True if len(class_name) == 1 and class_name[0] == "" else False
+        logging.debug("Generating trees from " + assembly_file + " for " + ("all classes" if dump_all else "class " + class_name))
 
         # init cache
         if assembly_file not in self._tree_cache:
@@ -38,15 +33,10 @@ class TypeTreeGenerator(object):
         class_deque = deque([class_name])
         while class_deque:
             next_class = class_deque.popleft()
-
             if next_class in tree:
-                if (debug):
-                    print("Skipping. Already in tree: " + next_class)
                 continue
 
             if next_class in self._tree_cache[assembly_file]:
-                if (debug):
-                    print("Found in cache: " + next_class)
                 tree[next_class] = self._tree_cache[assembly_file][next_class]
                 continue
 
@@ -54,21 +44,20 @@ class TypeTreeGenerator(object):
 
             # will contain one element set to None if could not find class name
             if not (a := def_iter.GetEnumerator()) or not a.MoveNext() or (not a.Current and not a.MoveNext()):
-                print("Could not find class: " + next_class)
+                logging.warn("Could not find class: " + next_class)
                 continue
 
             class_tree, class_refs = self._dump_nodes(def_iter, blacklist)
             tree.update(class_tree)
-            for class_ref in class_refs:
-                if (
-                    not dump_all
-                    and class_ref not in blacklist
-                    and class_ref not in tree
-                    and class_deque.count(class_ref) == 0
-                ):
-                    if (debug):
-                        print("Appending " + class_ref + " to queue")
-                    class_deque.append(class_ref)
+            if not dump_all:
+                for class_ref in class_refs:
+                    if (
+                        class_ref not in blacklist
+                        and class_ref not in tree
+                        and class_deque.count(class_ref) == 0
+                    ):
+                        logging.debug("Appending referenced class " + class_ref + " to queue")
+                        class_deque.append(class_ref)
 
         self._tree_cache[assembly_file].update(tree)
 
@@ -79,21 +68,15 @@ class TypeTreeGenerator(object):
         class_refs = []
         for d in def_iter:
             if d.FullName in blacklist:
-                if debug:
-                    reason = "special Unity class" if d.FullName in self.UNITY_CLASSES else "previously failed to dump"
-                    print("Skipping tree generation for " + d.FullName + " (" + reason + ")")
                 continue
 
-            if debug:
-                print("Generating tree for " + d.FullName)
+            logging.debug("Generating tree for " + d.FullName)
 
             try:
                 nodes = self.generator.convertToTypeTreeNodes(d, self.unity_version)
-            except Exception as e:
+            except Exception:
                 blacklist.append(d.FullName)
-                if (debug):
-                    print("Failed getting node: " + d.FullName)
-                    print(e)
+                logging.exception("Failed getting node: " + d.FullName)
                 continue
 
             tree[d.FullName] = []
@@ -125,9 +108,10 @@ class TypeTreeGenerator(object):
         if not os.access(dir, os.W_OK):
             raise ValueError("output file's directory is inaccessible")
 
-        print("Exporting tree to " + output_file + "...")
         with open(output_file, "wt", encoding="utf8") as f:
             json.dump(tree, f, ensure_ascii=False)
+
+        logging.info("Exported tree to " + output_file)
 
     def clear_cache(self):
         self._tree_cache.clear()
