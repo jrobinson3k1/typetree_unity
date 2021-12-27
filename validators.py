@@ -1,4 +1,5 @@
 import os
+import logging
 import argparse
 import re
 
@@ -44,5 +45,5 @@ class ValidateUnityVersion(argparse.Action):
 
         version = match.group(0)
         if version != values:
-            print("Resolved Unity version from " + values + " to " + version)
+            logging.info("Resolved Unity version from " + values + " to " + version)
         setattr(namespace, self.dest, version)
