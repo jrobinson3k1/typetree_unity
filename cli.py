@@ -6,6 +6,7 @@ from argparse import Namespace
 from argparse import ArgumentParser
 import validators
 
+from TypeTreeGeneratorPy import OutputMode
 from TypeTreeGeneratorPy import TypeTreeGenerator
 from TypeTreeGeneratorPy import __version__ as version
 
@@ -16,6 +17,9 @@ def main():
 
     if args.enable_debug_output:
         console.setLevel(logging.DEBUG)
+
+    output_dir, output_file_name, output_file_ext = _deconstruct_path(args.output_file)
+    output_mode = OutputMode.fromExt(output_file_ext)
 
     generator = TypeTreeGenerator(args.assembly_folder, args.unity_version)
     trees = {}
@@ -29,9 +33,16 @@ def main():
             ]
             trees.sort()
 
-        generator.export_tree(trees, args.output_file)
+        generator.export_tree(trees, output_dir, output_file_name, output_mode)
     else:
         logging.info("Type tree did not generate")
+
+
+def _deconstruct_path(path):
+    dir, file = os.path.split(path)
+    file_name, file_ext = os.path.splitext(file)
+    file_ext = file_ext.split(".")[1] if file_ext else file_ext
+    return dir, file_name, file_ext
 
 
 def _get_args():
@@ -44,7 +55,7 @@ def _get_args():
     namespace = Namespace()
     setattr(namespace, "default_output_folder", default_output_folder)
 
-    parser = ArgumentParser(description="Generates type trees from Unity assemblies and outputs in JSON format")
+    parser = ArgumentParser(description="Generates type trees from Unity assemblies and outputs in JSON or text format")
     parser.add_argument(
         "assembly_folder",
         action=validators.ValidateFolderExistsAction,

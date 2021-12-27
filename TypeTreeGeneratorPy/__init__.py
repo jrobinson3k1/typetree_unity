@@ -22,4 +22,5 @@ clr.AddReference("TypeTreeGenerator")
 
 # needs to be imported after TypeTreeGenerator reference is added
 from .generator import TypeTreeGenerator  # noqa: E402
-__all__ = ["TypeTreeGenerator"]
+from .generator import OutputMode  # noqa: E402
+__all__ = ["TypeTreeGenerator", "OutputMode"]
