@@ -18,7 +18,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install pylint
-        pip install git+https//github.com/pythonnet/pythonnet
+        pip install git+https://github.com/pythonnet/pythonnet
     - name: Analysing the code with pylint
       run: |
         pylint $(find . -name "*.py" | xargs)
