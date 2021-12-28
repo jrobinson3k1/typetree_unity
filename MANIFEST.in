@@ -1,0 +1,3 @@
+include TypeTreeGeneratorPy/*
+
+recursive-include TypeTreeGeneratorPy/libs *.dll *.runtimeconfig.json

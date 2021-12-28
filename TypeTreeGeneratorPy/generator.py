@@ -17,11 +17,15 @@ class TypeTreeGenerator(object):
         self.generator = self._create_generator(assembly_folder)
         self.unity_version = Array[int]([int(s) for s in unity_version.split('.')])
 
-    def generate_tree(self, assembly_file, class_name=[""]):
+    def generate_tree(self, assembly_file, class_names=[]):
         if not assembly_file:
             raise ValueError("assembly file not specified")
 
-        dump_all = True if len(class_name) == 1 and class_name[0] == "" else False
+        dump_all = False
+        if not class_names:
+            dump_all = True
+            class_names = [""]
+
         logging.debug("Generating trees from " + assembly_file + " for " + ("all classes" if dump_all else "class " + class_name))
 
         # init cache
@@ -30,7 +34,7 @@ class TypeTreeGenerator(object):
 
         tree = {}
         blacklist = self.UNITY_CLASSES.copy()
-        class_deque = deque([class_name])
+        class_deque = deque(class_names)
         while class_deque:
             next_class = class_deque.popleft()
             if next_class in tree:

@@ -1,3 +1,0 @@
-[submodule "uvf"]
-	path = TypeTreeGeneratorPy/libs/UnityVersionFinderPy
-	url = https://github.com/jrobinson3k1/UnityVersionFinderPy.git
