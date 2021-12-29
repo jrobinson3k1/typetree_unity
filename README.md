@@ -1,5 +1,8 @@
-# TypeTreeGeneratorPy
-[![Pylint](https://github.com/jrobinson3k1/TypeTreeGeneratorPy/actions/workflows/pylint.yml/badge.svg)](https://github.com/jrobinson3k1/TypeTreeGeneratorPy/actions/workflows/pylint.yml)
+# typetree-unity
+[![Pylint](https://github.com/jrobinson3k1/typetree_unity/actions/workflows/pylint.yml/badge.svg)](https://github.com/jrobinson3k1/typetree_unity/actions/workflows/pylint.yml)
+[![MIT](https://img.shields.io/pypi/l/UnityPy.svg)](https://github.com/jrobinson3k1/typetree_unity/blob/master/LICENSE)
+
+A standalone type tree generator for Unity assemblies.
 
 Version: `0.2.0-alpha`
 
@@ -27,4 +30,4 @@ If that's not the case, the game was likely built with il2cpp (will instead have
 Execute `python cli.py -h` in a terminal to see usage instructions.
 
 ## Direct Usage:
-See `cli.py` for example usage of the `TypeTreeGeneratorPy` module.
+See `cli.py` for example usage of the `typetree_unity` module.

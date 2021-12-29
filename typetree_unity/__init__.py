@@ -1,5 +1,5 @@
 r"""
-Type tree generator library.
+Unity type tree generator library.
 
 Classes
 -------

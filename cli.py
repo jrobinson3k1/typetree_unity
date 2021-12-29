@@ -1,12 +1,12 @@
-"""Generate and export type trees from a terminal."""
+"""Unity type tree generator CLI."""
 import os
 import logging
 from argparse import ArgumentParser
 
 import logger
 
-from TypeTreeGeneratorPy import TypeTreeGenerator
-from TypeTreeGeneratorPy import __version__ as version
+from typetree_unity import TypeTreeGenerator
+from typetree_unity import __version__ as version
 
 
 def main():
