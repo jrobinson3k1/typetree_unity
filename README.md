@@ -1,5 +1,7 @@
 # TypeTreeGeneratorPy
-Current version: 0.1.0-alpha
+[![Pylint](https://github.com/jrobinson3k1/TypeTreeGeneratorPy/actions/workflows/pylint.yml/badge.svg)](https://github.com/jrobinson3k1/TypeTreeGeneratorPy/actions/workflows/pylint.yml)
+
+Version: `0.2.0-alpha`
 
 Better README coming in the future. Still in early development. Things will be changing rapidly.
 
