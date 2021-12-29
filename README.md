@@ -1,10 +1,10 @@
-# typetree-unity
+# typetree_unity
 [![Pylint](https://github.com/jrobinson3k1/typetree_unity/actions/workflows/pylint.yml/badge.svg)](https://github.com/jrobinson3k1/typetree_unity/actions/workflows/pylint.yml)
 [![MIT](https://img.shields.io/pypi/l/UnityPy.svg)](https://github.com/jrobinson3k1/typetree_unity/blob/master/LICENSE)
 
 A standalone type tree generator for Unity assemblies.
 
-Version: `0.2.0-alpha`
+Version: `0.2.2-alpha`
 
 Better README coming in the future. Still in early development. Things will be changing rapidly.
 
