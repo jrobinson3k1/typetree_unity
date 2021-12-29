@@ -1,10 +1,9 @@
 # typetree_unity
+[![PyPI](https://img.shields.io/pypi/v/typetree-unity)](https://pypi.org/project/typetree-unity/)
 [![Pylint](https://github.com/jrobinson3k1/typetree_unity/actions/workflows/pylint.yml/badge.svg)](https://github.com/jrobinson3k1/typetree_unity/actions/workflows/pylint.yml)
 [![MIT](https://img.shields.io/pypi/l/UnityPy.svg)](https://github.com/jrobinson3k1/typetree_unity/blob/master/LICENSE)
 
 A standalone type tree generator for Unity assemblies.
-
-Version: `0.2.2-alpha`
 
 Better README coming in the future. Still in early development. Things will be changing rapidly.
 
@@ -22,12 +21,31 @@ To determine if a game is already built with Mono, look in the game directory fo
 
 If that's not the case, the game was likely built with il2cpp (will instead have a `GameAssembly.dll` file). To convert from il2cpp to Mono format, see [Il2CppDumper](https://github.com/Perfare/Il2CppDumper).
 
-## Prerequisites:
-- [Python3](https://www.python.org/downloads/)
-- [PythonNET](https://github.com/pythonnet/pythonnet)
+## Install:
+`pip install typtree_unity`
 
 ## CLI Usage:
-Execute `python cli.py -h` in a terminal to see usage instructions.
+```
+usage: __main__.py [-h] [-a] [-c [...]] [-o] [-v] [-n] [-d] input_folder unity_version
 
-## Direct Usage:
-See `cli.py` for example usage of the `typetree_unity` module.
+Generates type trees from Unity assemblies and outputs in JSON format.
+
+positional arguments:
+  input_folder          folder containing assemblies
+  unity_version         Unity build version
+
+options:
+  -h, --help            show this help message and exit
+  -a , --assembly       assembly file to load (default: Assembly-CSharp.dll)
+  -c [ ...], --classes [ ...]
+                        classes to dump for the type tree (all if unspecified). Automatically dumps class
+                        dependencies.
+  -o , --output         type tree output file (default:
+                        C:\Users\jason\workspace\typetree_unity\typetree_unity\output\typetree.json).
+  -v, --version         version of this package
+  -n, --namesonly       only output class names (will output as classnames.json if output is not specified)
+  -d, --debug           enable debug output
+```
+
+## Library Usage:
+See `typetree_unity/__main__.py` for example usage of the `typetree_unity` module.
