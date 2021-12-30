@@ -41,7 +41,7 @@ options:
                         classes to dump for the type tree (all if unspecified). Automatically dumps class
                         dependencies.
   -o , --output         type tree output file (default:
-                        C:\Users\jason\workspace\typetree_unity\typetree_unity\output\typetree.json).
+                        [script directory]\output\typetree.json).
   -v, --version         version of this package
   -n, --namesonly       only output class names (will output as classnames.json if output is not specified)
   -d, --debug           enable debug output
