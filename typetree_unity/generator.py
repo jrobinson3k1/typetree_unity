@@ -185,11 +185,11 @@ class TypeTreeGenerator:
             File path where type tree(s) will be exported
         """
         output_dir = os.path.dirname(output_file)
-        if dir and not os.path.isdir(output_dir):
-            os.mkdir(output_dir)
+        if output_dir and not os.path.isdir(output_dir):
+            os.makedirs(output_dir)
 
         if not os.access(output_dir, os.W_OK):
-            raise ValueError("output file's directory is inaccessible")
+            raise RuntimeError("output file's directory is inaccessible")
 
         with open(output_file, "wt", encoding="utf8") as stream:
             json.dump(tree, stream, ensure_ascii=False)

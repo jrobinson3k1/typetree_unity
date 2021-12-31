@@ -34,9 +34,13 @@ def main():
         console.setLevel(logging.DEBUG)
 
     generator = TypeTreeGenerator(args.assembly_folder, args.unity_version)
-    trees = {}
-    for class_name in args.class_names:
-        trees.update(generator.generate_tree(args.assembly_file, class_name))
+
+    if args.class_names:
+        trees = {}
+        for class_name in args.class_names:
+            trees.update(generator.generate_tree(args.assembly_file, class_name))
+    else:
+        trees = generator.generate_tree(args.assembly_file)
 
     if trees:
         if args.names_only:
@@ -61,8 +65,7 @@ def _get_args():
     )
     parser.add_argument(
         "assembly_folder",
-        metavar="input_folder",
-        help="folder containing assemblies"
+        help="folder containing assemblies (game's DLL files)"
     )
     parser.add_argument(
         "unity_version",
@@ -80,26 +83,17 @@ def _get_args():
         "-c",
         "--classes",
         dest="class_names",
-        default=[""],
         nargs="*",
         metavar="",
         help="classes to dump for the type tree (all if unspecified). "
             + "Automatically dumps class dependencies."
     )
     parser.add_argument(
-        "-o",
-        "--output",
-        dest="output_file",
-        metavar="",
-        help=f"type tree output file (default: {default_output_folder}{os.path.sep}"
-            + f"{default_typetree_name}.json)."
-    )
-    parser.add_argument(
-        "-v",
-        "--version",
-        action="version",
-        version=__version__,
-        help="version of this package"
+        "-d",
+        "--debug",
+        dest="enable_debug_output",
+        action="store_true",
+        help="enable debug output"
     )
     parser.add_argument(
         "-n",
@@ -110,19 +104,26 @@ def _get_args():
             + ".json if output is not specified)"
     )
     parser.add_argument(
-        "-d",
-        "--debug",
-        dest="enable_debug_output",
-        action="store_true",
-        help="enable debug output"
+        "-o",
+        "--output",
+        dest="output_file",
+        metavar="",
+        help=f"type tree output file (default: {default_output_folder}{os.path.sep}"
+            + f"{default_typetree_name}.json). Supports relative paths."
+    )
+    parser.add_argument(
+        "-v",
+        "--version",
+        action="version",
+        version=__version__,
+        help="version of this package"
     )
 
     args = parser.parse_args()
 
     if args.output_file:
-        output_dir, file_name = os.path.split(args.output_file)
-        if not output_dir:
-            args.output_file = os.path.join(default_output_folder, file_name)
+        if not os.path.isabs(args.output_file):
+            args.output_file = os.path.join(os.getcwd(), args.output_file)
     else:
         args.output_file = os.path.join(
             default_output_folder,
