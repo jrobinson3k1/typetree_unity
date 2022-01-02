@@ -26,24 +26,22 @@ If that's not the case, the game was likely built with il2cpp (will instead have
 
 ## CLI Usage:
 ```
-usage: __main__.py [-h] [-a] [-c [...]] [-o] [-v] [-n] [-d] input_folder unity_version
+usage: python -m typetree_unity [-h] [-c [...]] [-d] [-n] [-o] [-v] assembly_folder unity_version
 
 Generates type trees from Unity assemblies and outputs in JSON format.
 
 positional arguments:
-  input_folder          folder containing assemblies
+  assembly_folder       folder containing assemblies (game's DLL files)
   unity_version         Unity build version
 
 options:
   -h, --help            show this help message and exit
-  -a , --assembly       assembly file to load (default: Assembly-CSharp.dll)
   -c [ ...], --classes [ ...]
-                        classes to dump for the type tree (all if unspecified). Automatically dumps class
-                        dependencies.
-  -o , --output         type tree output file (default: [script directory]\output\typetree.json).
-  -v, --version         version of this package
-  -n, --namesonly       only output class names (will output as classnames.json if output is not specified)
+                        classes to dump for the type tree (all if unspecified). Automatically dumps class dependencies.
   -d, --debug           enable debug output
+  -n, --namesonly       only output class names (will output as classnames.json if output is not specified)
+  -o , --output         type tree output file (default: [script_directory]\output\typetree.json). Supports relative paths.
+  -v, --version         version of this package
 ```
 
 ## Library Usage:
