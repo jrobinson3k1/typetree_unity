@@ -10,7 +10,7 @@ Methods
     create_generator(assembly_folder, unity_version)
     export_type_tree(tree, output_file)
 """
-__version__ = "0.3.0-alpha"
+__version__ = "0.4.0-alpha"
 
 import os
 import logging

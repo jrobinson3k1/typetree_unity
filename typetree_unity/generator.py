@@ -146,7 +146,7 @@ class TypeTreeGenerator:
             if class_ref.class_name in _blacklist_classes:
                 logging.debug("Skipping blacklisted class: %s", class_ref.class_name)
                 continue
-            
+
             # TODO: Check cache, add parameter to allow checking from cache
             type_tree, referenced_classes = self._dump_class(
                 class_ref.assembly.file_name,
