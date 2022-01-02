@@ -1,6 +1,5 @@
 # typetree_unity
 [![PyPI](https://img.shields.io/pypi/v/typetree-unity)](https://pypi.org/project/typetree-unity/)
-[![Pylint](https://github.com/jrobinson3k1/typetree_unity/actions/workflows/pylint.yml/badge.svg)](https://github.com/jrobinson3k1/typetree_unity/actions/workflows/pylint.yml)
 [![MIT](https://img.shields.io/pypi/l/UnityPy.svg)](https://github.com/jrobinson3k1/typetree_unity/blob/master/LICENSE)
 
 A standalone type tree generator for Unity assemblies.
@@ -40,7 +39,7 @@ options:
                         classes to dump for the type tree (all if unspecified). Automatically dumps class dependencies.
   -d, --debug           enable debug output
   -n, --namesonly       only output class names (will output as classnames.json if output is not specified)
-  -o , --output         type tree output file (default: [script_directory]\output\typetree.json). Supports relative paths.
+  -o, --output         type tree output file (default: [script_directory]\output\typetree.json). Supports relative paths.
   -v, --version         version of this package
 ```
 
