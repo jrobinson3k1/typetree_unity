@@ -22,7 +22,8 @@ from AssetStudio import TypeDefinitionConverter
 
 _SEM_VER_REGEX = r"^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)"
 _PPTR_REGEX = r"^PPtr<(.+)>$"
-_UNITY_CLASSES = ["GameObject", "MonoScript", "Sprite"]
+# Unity-specific classes and known classes that can cause stackoverflow
+_blacklist_classes = ["GameObject", "MonoScript", "Sprite", "HxOctreeNode`1", "HxOctreeNode`1/NodeObject"]
 
 
 def _normalize_unity_version(version):
@@ -135,13 +136,17 @@ class TypeTreeGenerator:
 
         logging.debug("Generated trees for %s classes", count)
 
-        return trees
+        return self._flatten_tree(trees)
 
     def _generate_type_trees(self, class_refs):
         trees = {}
         class_deque = deque(class_refs)
         while class_deque:
             class_ref = class_deque.popleft()
+            if class_ref.class_name in _blacklist_classes:
+                logging.debug("Skipping blacklisted class: %s", class_ref.class_name)
+                continue
+            
             # TODO: Check cache, add parameter to allow checking from cache
             type_tree, referenced_classes = self._dump_class(
                 class_ref.assembly.file_name,
@@ -154,26 +159,24 @@ class TypeTreeGenerator:
                     trees[class_ref.assembly.base_name].update(type_tree)
 
             for class_name in referenced_classes:
-                if (
-                    class_name not in _UNITY_CLASSES and
-                    class_deque.count(class_name) == 0
-                ):
-                    class_ref = None
-                    for ref in self._available_classes:
-                        if ref.class_name == class_name:
-                            class_ref = ref
-                            break
+                referenced_class_ref = None
+                for ref in self._available_classes:
+                    if ref.class_name == class_name:
+                        referenced_class_ref = ref
+                        break
 
-                    if (
-                        class_ref and (
-                            class_ref.assembly.base_name not in trees or
-                            class_ref.class_name not in trees[class_ref.assembly.base_name])
-                    ):
-                        logging.debug(
-                            "Appending referenced class %s to queue",
-                            class_ref.class_name
-                        )
-                        class_deque.append(class_ref)
+                if (
+                    referenced_class_ref and
+                    referenced_class_ref.class_name not in _blacklist_classes and
+                    class_deque.count(referenced_class_ref) == 0 and (
+                        referenced_class_ref.assembly.base_name not in trees or
+                        referenced_class_ref.class_name not in trees[referenced_class_ref.assembly.base_name])
+                ):
+                    logging.debug(
+                        "Appending referenced class %s to queue",
+                        referenced_class_ref.class_name
+                    )
+                    class_deque.append(class_ref)
 
         return trees
 
@@ -225,6 +228,13 @@ class TypeTreeGenerator:
                 return assembly_base
 
         return None
+
+    @classmethod
+    def _flatten_tree(cls, tree):
+        flat_tree = {}
+        for key, value in tree.items():
+            flat_tree.update(value)
+        return flat_tree
 
     @classmethod
     def _find_all_classes(cls, assembly_folder):
