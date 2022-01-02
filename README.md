@@ -1,5 +1,6 @@
 # typetree_unity
 [![PyPI](https://img.shields.io/pypi/v/typetree-unity)](https://pypi.org/project/typetree-unity/)
+[![Lint](https://github.com/jrobinson3k1/typetree_unity/actions/workflows/lint.yml/badge.svg)](https://github.com/jrobinson3k1/typetree_unity/actions/workflows/lint.yml)
 [![MIT](https://img.shields.io/pypi/l/UnityPy.svg)](https://github.com/jrobinson3k1/typetree_unity/blob/master/LICENSE)
 
 A standalone type tree generator for Unity assemblies.
