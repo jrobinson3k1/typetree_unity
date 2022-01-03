@@ -22,8 +22,11 @@ from AssetStudio import TypeDefinitionConverter
 
 _SEM_VER_REGEX = r"^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)"
 _PPTR_REGEX = r"^PPtr<(.+)>$"
-# Unity-specific classes and known classes that can cause stackoverflow
-_blacklist_classes = ["GameObject", "MonoScript", "Sprite", "HxOctreeNode`1", "HxOctreeNode`1/NodeObject"]
+_BLACKLIST_CLASSES = [
+    "GameObject", "MonoBehaviour", "MonoScript", "Sprite",  # Unity classes
+    "HxOctreeNode`1", "HxOctreeNode`1/NodeObject", "Object"
+]
+"""Unity-specific classes and known classes that can cause stackoverflow or can't be parsed"""
 
 
 def _normalize_unity_version(version):
@@ -140,10 +143,11 @@ class TypeTreeGenerator:
 
     def _generate_type_trees(self, class_refs):
         trees = {}
+        local_blacklist = _BLACKLIST_CLASSES.copy()
         class_deque = deque(class_refs)
         while class_deque:
             class_ref = class_deque.popleft()
-            if class_ref.class_name in _blacklist_classes:
+            if class_ref.class_name in local_blacklist:
                 logging.debug("Skipping blacklisted class: %s", class_ref.class_name)
                 continue
 
@@ -152,22 +156,31 @@ class TypeTreeGenerator:
                 class_ref.assembly.file_name,
                 class_ref.class_name
             )
+
             if type_tree:
                 if class_ref.assembly.base_name not in trees:
                     trees[class_ref.assembly.base_name] = type_tree
                 else:
                     trees[class_ref.assembly.base_name].update(type_tree)
+            else:
+                local_blacklist.append(class_ref.class_name)
 
             for class_name in referenced_classes:
+                if class_name in local_blacklist:
+                    continue
+
                 referenced_class_ref = None
                 for ref in self._available_classes:
                     if ref.class_name == class_name:
                         referenced_class_ref = ref
                         break
 
+                if not referenced_class_ref:
+                    local_blacklist.append(class_name)
+                    logging.warning("Failed to find referenced class %s", class_name)
+                    continue
+
                 if (
-                    referenced_class_ref and
-                    referenced_class_ref.class_name not in _blacklist_classes and
                     class_deque.count(referenced_class_ref) == 0 and (
                         referenced_class_ref.assembly.base_name not in trees or
                         referenced_class_ref.class_name not in trees[referenced_class_ref.assembly.base_name])
