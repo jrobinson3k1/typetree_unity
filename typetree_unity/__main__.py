@@ -5,7 +5,6 @@ from logging import LogRecord
 from logging import StreamHandler
 from argparse import ArgumentParser
 
-from typetree_unity import TypeTreeGenerator
 from typetree_unity import export_type_tree
 from typetree_unity import __version__
 
@@ -36,6 +35,8 @@ def main():
     if args.enable_debug_output:
         console.setLevel(logging.DEBUG)
 
+    # delay import since loading the CLR is expensive
+    from typetree_unity.clr import TypeTreeGenerator
     generator = TypeTreeGenerator(args.assembly_folder, args.unity_version)
 
     if args.class_names:

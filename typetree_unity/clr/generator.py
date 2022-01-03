@@ -185,11 +185,8 @@ class TypeTreeGenerator:
                         referenced_class_ref.assembly.base_name not in trees or
                         referenced_class_ref.class_name not in trees[referenced_class_ref.assembly.base_name])
                 ):
-                    logging.debug(
-                        "Appending referenced class %s to queue",
-                        referenced_class_ref.class_name
-                    )
-                    class_deque.append(class_ref)
+                    class_deque.append(referenced_class_ref)
+                    logging.debug("Appended referenced class %s to queue", referenced_class_ref.class_name)
 
         return trees
 
